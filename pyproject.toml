@@ -21,6 +21,7 @@ einops = "0.3.0"
 timm = "0.5.4"
 matplotlib = "^3.7.2"
 scikit-image = "^0.21.0"
+natsort = "^8.4.0"
 
 
 [tool.poetry.group.dev.dependencies]

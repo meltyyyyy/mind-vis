@@ -1212,6 +1212,21 @@ files = [
 ]
 
 [[package]]
+name = "natsort"
+version = "8.4.0"
+description = "Simple yet flexible natural sorting in Python."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "natsort-8.4.0-py3-none-any.whl", hash = "sha256:4732914fb471f56b5cce04d7bae6f164a592c7712e1c85f9ef585e197299521c"},
+    {file = "natsort-8.4.0.tar.gz", hash = "sha256:45312c4a0e5507593da193dedd04abb1469253b601ecaf63445ad80f0a1ea581"},
+]
+
+[package.extras]
+fast = ["fastnumbers (>=2.0.0)"]
+icu = ["PyICU (>=1.0.0)"]
+
+[[package]]
 name = "networkx"
 version = "3.1"
 description = "Python package for creating and manipulating graphs and networks"
@@ -2446,4 +2461,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<4.0"
-content-hash = "7deb9692c47ec726719ee1ac3f00e0b0d6e857a3c00df0597c766920d38e2b88"
+content-hash = "f8e5e2fce1b61fdb4609f094596e05413e74d703afaa6e434464918ad350c70e"
