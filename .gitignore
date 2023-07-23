@@ -14,3 +14,7 @@ mind_vis.egg-info/
 *.nii
 *.gz
 *.pth
+.cache/*
+.local/*
+sandbox/*
+mind-vis.sif
