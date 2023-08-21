@@ -30,8 +30,17 @@ From: nvidia/cuda:11.5.2-runtime-centos7
     export POETRY_HOME=/opt/poetry
     export PATH=$POETRY_HOME/bin:$PATH
 
+    # HCP
+    export PATH=$PATH:$WORKDIR/.local/workbench/bin_rh_linux64
+
+    # FreeSurfer
+    export FREESURFER_HOME=$WORKDIR/.local/freesurfer
+    export SUBJECT_DIR=$FREESURFER_HOME/subjects
 %post
     export DEBIAN_FRONTEND=noninteractive
+    # export WORKDIR=$HOME/workspace/mind-vis
+    # export FREESURFER_HOME=$WORKDIR/.local/freesurfer
+    # export SUBJECT_DIR=$FREESURFER_HOME/subjects
 
     # python settings
     # python
@@ -46,11 +55,11 @@ From: nvidia/cuda:11.5.2-runtime-centos7
     export PATH=$POETRY_ROOT/bin:$PATH
 
     yum -y install \
-	gcc \
+	    gcc \
         make \
         curl \
         git \
-	openssl-devel \
+	    openssl-devel \
         readline-devel \
         sqlite-devel \
         xz-devel \
@@ -62,10 +71,18 @@ From: nvidia/cuda:11.5.2-runtime-centos7
         llvm \
         wget \
         unzip \
-	which \
+	    which \
         libSM.x86_64 \
         libXrender.x86_64 \
-        libXext.x86_64
+        libXext.x86_64 \
+        mesa-libGL
+
+    # Install freesurfer
+    # This takes about 1 hour. It's recommended to download the archive in advance.
+    # curl https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.4.1/freesurfer-linux-centos7_x86_64-7.4.1.tar.gz -o freesurfer-linux-centos7_x86_64-7.4.1.tar.gz
+    # mkdir -p $WORKDIR/.local
+    # tar -zxpf /opt/installers/freesurfer/freesurfer-linux-centos7_x86_64-7.4.1.tar.gz -C $WORKDIR/.local/
+    # source $FREESURFER_HOME/SetUpFreeSurfer.sh
 
     # Install pyenv
     git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT
@@ -74,8 +91,8 @@ From: nvidia/cuda:11.5.2-runtime-centos7
     pyenv local $PYTHON_VERSION
 
     # Install poetry
-    git clone https://github.com/python-poetry/install.python-poetry.org.git /opt/installer
-    POETRY_HOME=$POETRY_ROOT python3 /opt/installer/install-poetry.py
+    git clone https://github.com/python-poetry/install.python-poetry.org.git /opt/installers/poetry
+    POETRY_HOME=$POETRY_ROOT python3 /opt/installers/poetry/install-poetry.py
     poetry config virtualenvs.in-project true
 
 %labels

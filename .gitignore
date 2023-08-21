@@ -5,6 +5,10 @@ wandb/
 lightning_logs/
 image_generation/
 mind_vis.egg-info/
+pretrains/
+data/
+workbench/
+Glasser_et_al_2016_HCP_MMP1.0_kN_RVVG/
 *.out
 *.npz
 *.ckpt
@@ -14,6 +18,11 @@ mind_vis.egg-info/
 *.nii
 *.gz
 *.pth
+*.log
+*.rpm
+*.gii
+*.annot
+*.jpg
 .cache/*
 .local/*
 sandbox/*
