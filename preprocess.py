@@ -1,3 +1,4 @@
+from typing import Dict
 import numpy as np
 import nibabel as nib
 import hcp_utils as hcp
@@ -13,7 +14,14 @@ logger = logging.getLogger(__name__)
 MMP_PATH = "mmp_1.0.npz"
 HCP_BASE = "/project/nblab/takeru.abe/data/hcp/HCP_1200"
 
-def def_output_path(source : str):
+def def_output_path(source: str) -> str:
+    """
+    Define the output path for the given source.
+
+    :param source: The source filepath.
+    :return: The output path as a string.
+    """
+    
     subject_id = source.split('/')[7] 
     session = source.split('/')[10].split('_')[1]  # Extracts REST1 or REST2
     phase_encoding = source.split('/')[10].split('_')[2]  # Extracts LR or RL
@@ -30,7 +38,16 @@ def def_output_path(source : str):
     return output_path
 
 
-def extract_visual_voxels(Xn, labels, map_all):
+def extract_visual_voxels(Xn: np.ndarray, labels: np.ndarray, map_all: np.ndarray) -> Dict[str, np.ndarray]:
+    """
+    Extract visual voxels for regions ['V1', 'V2', 'V3', 'V4'].
+
+    :param Xn: Normalized voxel data as a NumPy array.
+    :param labels: Label data as a NumPy array.
+    :param map_all: Mapping of all voxel regions.
+    :return: A dictionary containing concatenated visual voxel data for specified regions.
+    """
+    
     roi_voxels = {}
     for region in ['V1', 'V2', 'V3', 'V4']:
         L_region_id = np.where(labels == f'L_{region}')[0][0]
@@ -44,7 +61,14 @@ def extract_visual_voxels(Xn, labels, map_all):
     assert roi_voxels['V4'].shape[1] == 661, "Number of voxels for V1 must be 661"
     return roi_voxels
     
-def main_worker(mmp_path: str, hcp_base : str):
+def main_worker(mmp_path: str, hcp_base: str) -> None:
+    """
+    Main worker function to process HCP data.
+
+    :param mmp_path: Path to the MMP data file.
+    :param hcp_base: Base path for the HCP dataset.
+    """
+    
     mmp_data = np.load(mmp_path)
     map_all = mmp_data['map_all']
     labels = mmp_data['labels']
