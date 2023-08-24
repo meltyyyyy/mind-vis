@@ -118,11 +118,11 @@ class hcp_dataset(Dataset):
 
         if include_hcp:
             for c, sub in enumerate(os.listdir(path)):
-                if os.path.isfile(os.path.join(path, sub, "HCP_visual_voxel.npz")) == False:
+                if os.path.isfile(os.path.join(path, sub, "HCP_visual_voxel_REST1_LR.npz")) == False:
                     continue
                 if num_sub_limit is not None and c > num_sub_limit:
                     break
-                npz = dict(np.load(os.path.join(path, sub, "HCP_visual_voxel.npz")))
+                npz = dict(np.load(os.path.join(path, sub, "HCP_visual_voxel_REST1_LR.npz")))
                 voxels = (
                     np.concatenate([npz["V1"], npz["V2"], npz["V3"], npz["V4"]], axis=-1) if roi == "VC" else npz[roi]
                 )  # 1200, num_voxels

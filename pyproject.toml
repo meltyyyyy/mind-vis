@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["meltyyyyy <takeru.abe.g1@gmail.com>"]
 readme = "README.md"
-packages = [{include = "mind_vis"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
