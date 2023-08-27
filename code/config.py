@@ -20,9 +20,9 @@ class Config_MBM_fMRI(Config_MAE_fMRI):
         self.lr = 2.5e-4
         self.min_lr = 0.0
         self.weight_decay = 0.05
-        self.num_epoch = 500
+        self.num_epoch = 1000
         self.warmup_epochs = 40
-        self.batch_size = 32
+        self.batch_size = 128
         self.clip_grad = 0.8
 
         # Model Parameters
@@ -50,7 +50,7 @@ class Config_MBM_fMRI(Config_MAE_fMRI):
         self.img_recon_weight = 0.5
         self.focus_range = None  # [0, 1500] # None to disable it
         self.focus_rate = 0.6
-
+        
         # distributed training
         self.local_rank = 0
 

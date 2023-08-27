@@ -84,6 +84,7 @@ def get_args_parser():
 
     # distributed training parameters
     parser.add_argument("--local_rank", type=int)
+    parser.add_argument("--world_size", type=int)
 
     return parser
 
@@ -103,21 +104,20 @@ def fmri_transform(x, sparse_rate=0.2):
 
 
 def main(config):
-    if torch.cuda.device_count() > 1:
-        torch.cuda.set_device(config.local_rank)
-        torch.distributed.init_process_group(backend="nccl")
+    torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+    torch.distributed.init_process_group(backend="nccl")
     output_path = os.path.join(
         config.root_path, "results", "fmri_pretrain", "%s" % (datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S"))
     )
     # output_path = os.path.join(config.root_path, 'results', 'fmri_pretrain')
     config.output_path = output_path
-    logger = wandb_logger(config) if config.local_rank == 0 else None
-
-    if config.local_rank == 0:
+    logger = None
+    if int(os.environ["RANK"]) == 0:
+        logger = wandb_logger(config)
         os.makedirs(output_path, exist_ok=True)
         create_readme(config, output_path)
 
-    device = torch.device(f"cuda:{config.local_rank}") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cuda:" + os.environ["LOCAL_RANK"]) if torch.cuda.is_available() else torch.device("cpu")
     torch.manual_seed(config.seed)
     np.random.seed(config.seed)
 
@@ -134,11 +134,7 @@ def main(config):
     )
 
     print(f"Dataset size: {len(dataset_pretrain)}\nNumber of voxels: {dataset_pretrain.num_voxels}")
-    sampler = (
-        torch.utils.data.DistributedSampler(dataset_pretrain, rank=config.local_rank)
-        if torch.cuda.device_count() > 1
-        else None
-    )
+    sampler = torch.utils.data.DistributedSampler(dataset_pretrain, rank=int(os.environ["RANK"]))
 
     dataloader_hcp = DataLoader(
         dataset_pretrain, batch_size=config.batch_size, sampler=sampler, shuffle=(sampler is None), pin_memory=True
@@ -162,12 +158,11 @@ def main(config):
     )
     model.to(device)
     model_without_ddp = model
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-        model = DistributedDataParallel(
+    model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+    model = DistributedDataParallel(
             model,
-            device_ids=[config.local_rank],
-            output_device=config.local_rank,
+            device_ids=[int(os.environ["LOCAL_RANK"])],
+            output_device=int(os.environ["LOCAL_RANK"]),
             find_unused_parameters=config.use_nature_img_loss,
         )
 
@@ -196,8 +191,7 @@ def main(config):
             param.requires_grad = False
 
     for ep in range(config.num_epoch):
-        if torch.cuda.device_count() > 1:
-            sampler.set_epoch(ep)  # to shuffle the data at every epoch
+        sampler.set_epoch(ep)  # to shuffle the data at every epoch
         cor = train_one_epoch(
             model,
             dataloader_hcp,
@@ -213,7 +207,7 @@ def main(config):
             preprocess,
         )
         cor_list.append(cor)
-        if (ep % 20 == 0 or ep + 1 == config.num_epoch) and ep != 0 and config.local_rank == 0:
+        if (ep % 20 == 0 or ep + 1 == config.num_epoch) and ep != 0 and int(os.environ["RANK"]) == 0:
             # save models
             save_model(config, ep, model_without_ddp, optimizer, loss_scaler, os.path.join(output_path, "checkpoints"))
             # plot figures
